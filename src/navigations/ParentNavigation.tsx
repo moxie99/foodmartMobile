@@ -1,28 +1,33 @@
-import React, {useEffect, useState} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, {useEffect} from 'react';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import TabNavigator from './TabNavigator';
-import LoginScreen from '../screens/login/LoginScreen';
-import RegistrationScreen from '../screens/Registration/RegistrationScreen';
-import GoogleSignUpScreen from '../screens/Registration/GoogleSignUpScreen';
-import NewsHeader from '../components/NewsHeader';
-import NewsListing from '../screens/Home/NewsListing';
-import NewsDetails from '../screens/Home/NewsDetails';
-import NewsWebPage from '../screens/Home/NewsWebView';
+import {
+  SplashScreen,
+  WelcomeScreen,
+  SigninScreen,
+  SignupScreen,
+  ForgotPasswordScreen,
+  RegisterPhoneScreen,
+  VerificationScreen,
+  HomeScreen,
+  RestaurantScreen,
+  FoodScreen,
+} from '../screens';
 import {useDispatch, useSelector} from 'react-redux';
 import {GeneralAction} from '../actions';
 
 export type ParentStackParamList = {
-  Main: {};
-  Login: {};
-  Register: undefined;
-  Google: undefined;
-  NewsHeader: undefined;
-  NewsListing: {q: string};
-  NewsDetails: {};
-  NewsWebPage: {
-    url: string;
-  };
+  Splash: undefined;
+  Welcome: undefined;
+  Signin: undefined;
+  Signup: undefined;
+  ForgotPassword: undefined;
+  RegisterPhone: undefined;
+  Verification: {};
+  HomeScreen: undefined;
+  Restaurant: {phoneNumber: undefined};
+  Food: {};
+  HomeTabs: undefined;
 };
 const ParentStack = createNativeStackNavigator<ParentStackParamList>();
 const ParentNavigator = () => {
@@ -36,33 +41,35 @@ const ParentNavigator = () => {
   }, []);
 
   return (
-    <ParentStack.Navigator>
-      {users ? (
-        <ParentStack.Group>
-          <ParentStack.Screen name="Main">
-            {props => <TabNavigator {...props} extraData={users} />}
-          </ParentStack.Screen>
-          <ParentStack.Screen name="NewsHeader" component={NewsHeader} />
-          <ParentStack.Screen name="NewsListing" component={NewsListing} />
-          <ParentStack.Screen name="NewsDetails" component={NewsDetails} />
-          <ParentStack.Screen name="NewsWebPage" component={NewsWebPage} />
-          <ParentStack.Screen name="Login" component={LoginScreen} />
-          <ParentStack.Screen name="Register" component={RegistrationScreen} />
-          <ParentStack.Screen name="Google" component={GoogleSignUpScreen} />
-        </ParentStack.Group>
+    <ParentStack.Navigator screenOptions={{headerShown: false}}>
+      {isAppLoading ? (
+        <ParentStack.Screen name="Splash" component={SplashScreen} />
+      ) : !token || token === null || token === '' ? (
+        <>
+          {isFirstTimeUse && (
+            <ParentStack.Screen name="Welcome" component={WelcomeScreen} />
+          )}
+          <ParentStack.Screen name="Signin" component={SigninScreen} />
+          <ParentStack.Screen name="Signup" component={SignupScreen} />
+          <ParentStack.Screen
+            name="ForgotPassword"
+            component={ForgotPasswordScreen}
+          />
+          <ParentStack.Screen
+            name="RegisterPhone"
+            component={RegisterPhoneScreen}
+          />
+          <ParentStack.Screen
+            name="Verification"
+            component={VerificationScreen}
+          />
+        </>
       ) : (
-        <ParentStack.Group>
-          <ParentStack.Screen name="Login" component={LoginScreen} />
-          <ParentStack.Screen name="Register" component={RegistrationScreen} />
-          <ParentStack.Screen name="Google" component={GoogleSignUpScreen} />
-          <ParentStack.Screen name="NewsHeader" component={NewsHeader} />
-          <ParentStack.Screen name="NewsListing" component={NewsListing} />
-          <ParentStack.Screen name="NewsDetails" component={NewsDetails} />
-          <ParentStack.Screen name="NewsWebPage" component={NewsWebPage} />
-          <ParentStack.Screen name="Main">
-            {props => <TabNavigator {...props} extraData={users} />}
-          </ParentStack.Screen>
-        </ParentStack.Group>
+        <>
+          <ParentStack.Screen name="HomeTabs" component={TabNavigator} />
+          <ParentStack.Screen name="Restaurant" component={RestaurantScreen} />
+          <ParentStack.Screen name="Food" component={FoodScreen} />
+        </>
       )}
     </ParentStack.Navigator>
   );
